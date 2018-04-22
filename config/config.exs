@@ -8,7 +8,6 @@ use Mix.Config
 # Configures the endpoint
 config :doritos, DoritosWeb.Endpoint,
   url: [host: "localhost"],
-  watchers: [yarn: ["start", cd: Path.expand("../ui", __DIR__)]],
   secret_key_base: "bAPVsMUaEyexbxEDJ5TJlYM4Zq5pYFB95fSE6uo05nJ+NqBP6A2BQYhpyQoXy3lX",
   render_errors: [view: DoritosWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: Doritos.PubSub, adapter: Phoenix.PubSub.PG2]

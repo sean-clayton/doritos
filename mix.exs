@@ -36,7 +36,8 @@ defmodule Doritos.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:cowboy, "~> 1.0"},
       {:absinthe_phoenix, "~> 1.4"},
-      {:jason, "~> 1.0"}
+      {:jason, "~> 1.0"},
+      {:plug_static_index_html, "~> 1.0"}
     ]
   end
 end
