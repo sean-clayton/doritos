@@ -44,6 +44,7 @@ export const servers = Array(10) // 620
   .fill()
   .map(() => ({
     ip: `${faker.internet.ip()}:11775`,
+    region: faker.random.arrayElement(["NA", "SA", "EU", "AF", "OC", "AS"]),
     name: faker.random.words(),
     port: 11774,
     hostPlayer: faker.internet.userName(),

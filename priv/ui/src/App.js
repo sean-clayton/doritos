@@ -1,7 +1,11 @@
+/* global dew */
 import React from "react";
-import styled, { injectGlobal, css } from "react-emotion";
+import styled, { injectGlobal } from "react-emotion";
+import { Tooltip, Icon, Intent } from "@blueprintjs/core";
+import { IconNames } from "@blueprintjs/icons";
 import { palette } from "color-palette";
 import { servers } from "fake-data";
+import ServerBrowser from "components/ServerBrowser";
 import bg from "images/bg.jpg";
 
 injectGlobal`
@@ -20,6 +24,7 @@ injectGlobal`
       .darken(1)
       .desaturate(1.33)
       .hex()};
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.75));
     color: white;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', sans-serif;
   }
@@ -40,6 +45,8 @@ const AppContainer = styled("main")`
   min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 
   &:after {
     content: "";
@@ -57,65 +64,49 @@ const AppContainer = styled("main")`
   }
 `;
 
-const ServerBrowserLayout = styled("div")`
-  display: grid;
-  grid-template-areas: "servers server-info";
+const DewConnectedIndicatorWrapper = styled("div")`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 `;
 
-const ServerList = styled("ul")`
-  grid-area: servers;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-`;
-
-const ServerListItemWrapper = styled("li")`
-  display: grid;
-`;
-
-const ServerListItem = ({ server }) => (
-  <ServerListItemWrapper>
-    <h3
-      className={css`
-        margin: 0;
-      `}
+const DewConnectedIndicator = ({ connected }) => (
+  <DewConnectedIndicatorWrapper>
+    <Tooltip
+      intent={connected ? Intent.SUCCESS : Intent.DANGER}
+      content={
+        connected
+          ? "Connected to El Dewrito"
+          : "Could not connect to El Dewrito"
+      }
     >
-      {server.name}
-    </h3>
-  </ServerListItemWrapper>
+      <Icon
+        icon={connected ? IconNames.TICK_CIRCLE : IconNames.OFFLINE}
+        intent={connected ? Intent.SUCCESS : Intent.DANGER}
+      />
+    </Tooltip>
+  </DewConnectedIndicatorWrapper>
 );
 
-const ServerInfoWrapper = styled("div")`
-  display: grid;
-  grid-area: server-info;
-`;
-
-class ServerInfo extends React.Component {
-  render() {
-    return (
-      <ServerInfoWrapper>
-        <h2>Select a server</h2>
-        <h3>to see more information</h3>
-      </ServerInfoWrapper>
-    );
-  }
-}
-
 class App extends React.Component {
+  state = {
+    dewLoaded: false
+  };
+  componentDidMount() {
+    try {
+      this.setState({
+        dewLoaded: window.dew !== undefined || dew !== undefined
+      });
+    } catch (e) {
+      // Swallow exception
+    }
+  }
   render() {
     return (
       <AppContainer className="pt-dark">
+        <DewConnectedIndicator connected={this.state.dewLoaded} />
         <h1>Dorito Server Browser</h1>
-        <p>It's pretty cool</p>
-        <ServerBrowserLayout>
-          <ServerList>
-            {servers.map(server => (
-              <ServerListItem key={server.ip} server={server} />
-            ))}
-          </ServerList>
-          <ServerInfo />
-        </ServerBrowserLayout>
+        <ServerBrowser servers={servers} />
       </AppContainer>
     );
   }
