@@ -1,6 +1,7 @@
 import React from "react";
-import styled, { injectGlobal } from "react-emotion";
+import styled, { injectGlobal, css } from "react-emotion";
 import { palette } from "color-palette";
+import { servers } from "fake-data";
 import bg from "images/bg.jpg";
 
 injectGlobal`
@@ -56,12 +57,65 @@ const AppContainer = styled("main")`
   }
 `;
 
+const ServerBrowserLayout = styled("div")`
+  display: grid;
+  grid-template-areas: "servers server-info";
+`;
+
+const ServerList = styled("ul")`
+  grid-area: servers;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+`;
+
+const ServerListItemWrapper = styled("li")`
+  display: grid;
+`;
+
+const ServerListItem = ({ server }) => (
+  <ServerListItemWrapper>
+    <h3
+      className={css`
+        margin: 0;
+      `}
+    >
+      {server.name}
+    </h3>
+  </ServerListItemWrapper>
+);
+
+const ServerInfoWrapper = styled("div")`
+  display: grid;
+  grid-area: server-info;
+`;
+
+class ServerInfo extends React.Component {
+  render() {
+    return (
+      <ServerInfoWrapper>
+        <h2>Select a server</h2>
+        <h3>to see more information</h3>
+      </ServerInfoWrapper>
+    );
+  }
+}
+
 class App extends React.Component {
   render() {
     return (
-      <AppContainer>
+      <AppContainer className="pt-dark">
         <h1>Dorito Server Browser</h1>
         <p>It's pretty cool</p>
+        <ServerBrowserLayout>
+          <ServerList>
+            {servers.map(server => (
+              <ServerListItem key={server.ip} server={server} />
+            ))}
+          </ServerList>
+          <ServerInfo />
+        </ServerBrowserLayout>
       </AppContainer>
     );
   }
