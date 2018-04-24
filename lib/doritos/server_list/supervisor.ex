@@ -7,9 +7,9 @@ defmodule Doritos.ServerList.Supervisor do
 
   def init(:ok) do
     children = [
-      worker(Doritos.ServerList.Cache, [[name: Doritos.ServerList.Cache]])
+      {Doritos.ServerList.Cache, []}
     ]
 
-    supervise(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end

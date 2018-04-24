@@ -10,7 +10,8 @@ defmodule Doritos.Application do
     children = [
       # Start the endpoint when the application starts
       supervisor(DoritosWeb.Endpoint, []),
-      supervisor(Doritos.ServerList.Supervisor, [])
+      supervisor(Doritos.ServerList.Supervisor, []),
+      worker(Doritos.ServerData.Fetcher, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
