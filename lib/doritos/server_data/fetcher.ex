@@ -57,10 +57,10 @@ defmodule Doritos.ServerData.Fetcher do
     |> MapSet.new()
     |> Flow.from_enumerable()
     |> Flow.partition()
-    |> Flow.map(fn ip ->
-      case HTTPoison.get(ip, timeout: 500) do
+    |> Flow.map(fn url ->
+      case HTTPoison.get(url, timeout: 500) do
         res = {:ok, %HTTPoison.Response{status_code: 200}} -> res
-        res -> {:error, ip, res}
+        res -> {:error, url, res}
       end
     end)
     |> Flow.map(&Doritos.ServerData.Cache.handle_new_data_response/1)
