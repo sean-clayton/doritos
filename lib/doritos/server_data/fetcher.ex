@@ -1,8 +1,9 @@
 defmodule Doritos.ServerData.Fetcher do
   use GenServer
+  import Logger
 
   def start_link() do
-    GenServer.start_link(__MODULE__, nil, name: {:global, :server_data_cache})
+    GenServer.start_link(__MODULE__, true, name: {:global, :server_data_cache})
   end
 
   def init(state) do
@@ -10,57 +11,55 @@ defmodule Doritos.ServerData.Fetcher do
     {:ok, state}
   end
 
-  def handle_info(:update_cache, _state) do
+  def handle_info(:update_cache, state) do
     schedule()
 
     server_list = GenServer.call({:global, :server_list_cache}, :give_server_list)
-    # server_list = ["http://158.69.166.144:8080/list"]
 
-    update_cache(server_list)
+    debug("Atemping to fetch more servers...")
 
-    {:noreply, nil}
+    case state do
+      true ->
+        debug("Able to fetch servers, starting...")
+        Task.start(__MODULE__, :update_cache, [server_list])
+        {:noreply, false}
+
+      false ->
+        debug("Still currently getting data from servers, not fetching more.")
+        {:noreply, false}
+    end
+  end
+
+  def handle_cast(:update_done, _state) do
+    debug("Done fetching servers")
+    {:noreply, true}
   end
 
   def handle_call(:give_cached_data, _from, state) do
     {:reply, state, state}
   end
 
+  def update_cache([]) do
+    debug("Server list is empty...")
+    send_update_done_signal()
+  end
+
   def update_cache(server_list) do
-    # updated_at = DateTime.to_iso8601(DateTime.utc_now())
-    # new_cache =
+    debug("We have servers. Fetching...")
+
     server_list
+    |> Enum.map(fn ip ->
+      HTTPotion.get(ip)
+    end)
     |> IO.inspect()
-    |> Task.async_stream(
-      fn ip ->
-        HTTPoison.get(ip, timeout: 1_000)
-      end,
-      timeout: :infinity
-    )
-    |> Enum.each(&IO.inspect/1)
+    |> Enum.filter(&match?(%HTTPotion.Response{status_code: 200}, &1))
+    |> (fn _ -> send_update_done_signal() end).()
 
-    # |> Stream.filter(&match?({:ok, %HTTPoison.Response{status_code: 200}}, &1))
+    {:ok, true}
+  end
 
-    # |> Enum.map(fn {task, res} ->
-    #   res || Task.shutdown(task)
-    # end)
-    # |> Enum.filter(fn task_res ->
-    #   case task_res do
-    #     {:ok, {:ok, %HTTPoison.Response{status_code: 200}}} -> true
-    #     _ -> false
-    #   end
-    # end)
-    # |> Enum.map(fn res ->
-    #   {:ok, {:ok, http_res = %HTTPoison.Response{status_code: 200}}} = res
-    #   http_res
-    # end)
-    # |> Enum.reduce(%{}, fn res, acc ->
-    #   ip = res.request_url
-    #   {:ok, body} = Jason.decode(res.body)
-
-    #   acc |> Map.put(ip, body)
-    # end)
-
-    {:ok, nil}
+  defp send_update_done_signal() do
+    GenServer.cast({:global, :server_data_cache}, :update_done)
   end
 
   def schedule() do

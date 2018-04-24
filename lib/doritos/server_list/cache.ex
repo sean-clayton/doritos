@@ -1,5 +1,6 @@
 defmodule Doritos.ServerList.Cache do
   use GenServer
+  import Logger
 
   def start_link(state) do
     GenServer.start_link(__MODULE__, state, name: {:global, :server_list_cache})
@@ -27,20 +28,26 @@ defmodule Doritos.ServerList.Cache do
   end
 
   def get_server_list() do
-    case HTTPoison.get("http://158.69.166.144:8080/list", timeout: 10_000) do
-      {:ok, %HTTPoison.Response{body: body, status_code: 200}} ->
+    debug("Getting master server list...")
+
+    case HTTPotion.get("http://158.69.166.144:8080/list", timeout: 25_000) do
+      %HTTPotion.Response{body: body, status_code: 200} ->
         case Jason.decode(body) do
           {:ok, %{"result" => %{"servers" => server_list}}} ->
+            debug("Got #{Enum.count(server_list)} servers from new master server list...")
+
             Task.start(GenServer, :call, [
               {:global, :server_list_cache},
               {:update_server_list, server_list}
             ])
 
           _ ->
-            {:error, "Could no get master server list"}
+            debug("Couldn't get the master server list")
+            {:error, "Could not get master server list"}
         end
 
       _ ->
+        debug("Couldn't get the master server list")
         {:error, "Could not get master server list"}
     end
   end
