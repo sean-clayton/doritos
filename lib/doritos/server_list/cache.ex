@@ -30,7 +30,7 @@ defmodule Doritos.ServerList.Cache do
   def get_server_list() do
     debug("Getting master server list...")
 
-    case HTTPotion.get("http://158.69.166.144:8080/list", timeout: 25_000) do
+    case HTTPotion.get("http://158.69.166.144:8080/list", timeout: 10_000) do
       %HTTPotion.Response{body: body, status_code: 200} ->
         case Jason.decode(body) do
           {:ok, %{"result" => %{"servers" => server_list}}} ->

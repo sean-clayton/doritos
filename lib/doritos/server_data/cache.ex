@@ -9,7 +9,7 @@ defmodule Doritos.ServerData.Cache do
   end
 
   def handle_new_data_response(res = {:ok, %{request_url: request_url, body: body}}) do
-    json = Jason.decode!(body)
+    json = Jason.decode!(body) |> Map.put("cachedAt", DateTime.utc_now())
     :ets.insert(@table, {request_url, json})
     res
   end

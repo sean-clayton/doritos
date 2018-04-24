@@ -8,11 +8,10 @@ use Mix.Config
 # with brunch.io to recompile .js and .css sources.
 config :doritos, DoritosWeb.Endpoint,
   http: [port: 4000],
-  watchers: [yarn: ["start", cd: Path.expand("../priv/ui", __DIR__)]],
+  # watchers: [yarn: ["start", cd: Path.expand("../priv/ui", __DIR__)]],
   debug_errors: true,
   code_reloader: true,
-  check_origin: false,
-  watchers: []
+  check_origin: false
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
