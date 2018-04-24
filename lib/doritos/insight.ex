@@ -1,6 +1,6 @@
 defmodule Doritos.Insight do
   def get_all_server_data() do
-    GenServer.call({:global, :server_data_cache}, :give_cached_data)
+    Doritos.ServerData.Cache.get_all_data()
   end
 
   def get_active_player_count() do
@@ -9,7 +9,8 @@ defmodule Doritos.Insight do
   def get_active_server_count() do
   end
 
-  def get_server_data_by_ip(_ip) do
+  def get_server_data_by_ip(ip) do
+    Doritos.ServerData.Cache.get_ip_data(ip)
   end
 
   # get_leaderboard_data

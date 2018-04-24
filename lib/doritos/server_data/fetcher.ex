@@ -47,15 +47,26 @@ defmodule Doritos.ServerData.Fetcher do
   def update_cache(server_list) do
     debug("We have servers. Fetching...")
 
-    server_list
-    |> Enum.map(fn ip ->
-      HTTPotion.get(ip)
-    end)
-    |> IO.inspect()
-    |> Enum.filter(&match?(%HTTPotion.Response{status_code: 200}, &1))
-    |> (fn _ -> send_update_done_signal() end).()
+    fetch_servers(server_list)
 
     {:ok, true}
+  end
+
+  def fetch_servers(server_list) do
+    server_list
+    |> MapSet.new()
+    |> Flow.from_enumerable()
+    |> Flow.partition()
+    |> Flow.map(fn ip ->
+      case HTTPoison.get(ip, timeout: 500) do
+        res = {:ok, %HTTPoison.Response{status_code: 200}} -> res
+        res -> {:error, ip, res}
+      end
+    end)
+    |> Flow.map(&Doritos.ServerData.Cache.handle_new_data_response/1)
+    |> Flow.run()
+
+    send_update_done_signal()
   end
 
   defp send_update_done_signal() do

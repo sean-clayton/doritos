@@ -11,6 +11,7 @@ defmodule Doritos.Application do
       # Start the endpoint when the application starts
       supervisor(DoritosWeb.Endpoint, []),
       supervisor(Doritos.ServerList.Supervisor, []),
+      worker(Doritos.ServerData.Cache, []),
       worker(Doritos.ServerData.Fetcher, [])
     ]
 
