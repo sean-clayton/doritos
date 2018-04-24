@@ -55,12 +55,14 @@ defmodule DoritosWeb.Resolver do
     dual_wielding = Map.get(map, :dual_wielding) || "0"
     sprint_enabled = Map.get(map, :sprint_enabled) || "0"
     sprint_unlimited_enabled = Map.get(map, :sprint_unlimited_enabled) || "0"
+    passworded = Map.get(map, :passworded) || false
 
     map
     |> Map.put(:assassination_enabled, assassination_enabled |> string_num_to_boolean)
     |> Map.put(:dual_wielding, dual_wielding |> string_num_to_boolean)
     |> Map.put(:sprint_enabled, sprint_enabled |> string_num_to_boolean)
     |> Map.put(:sprint_unlimited_enabled, sprint_unlimited_enabled |> string_num_to_boolean)
+    |> Map.put(:passworded, passworded)
   end
 
   def string_num_to_boolean(string) do
