@@ -73,6 +73,7 @@ defmodule DoritosWeb.Resolver do
   end
 
   def convert_camelcase_to_snakecase(map) do
+    IO.inspect(map)
     for {key, val} <- map, into: %{}, do: {Macro.underscore(key), val}
   end
 
@@ -86,6 +87,17 @@ defmodule DoritosWeb.Resolver do
 
     server
     |> Map.put(:status, status)
+  end
+
+  defp string_keys_to_atoms(map = %{"players" => players}) when is_list(players) do
+    map = for {key, val} <- map, into: %{}, do: {String.to_atom(key), val}
+
+    formatted_players =
+      map.players
+      |> Enum.map(&convert_camelcase_to_snakecase/1)
+      |> Enum.map(&string_keys_to_atoms/1)
+
+    map |> Map.put(:players, formatted_players)
   end
 
   defp string_keys_to_atoms(map = %{}) do

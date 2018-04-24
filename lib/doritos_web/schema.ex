@@ -51,6 +51,23 @@ defmodule DoritosWeb.Schema do
     field(:length, non_null(:integer))
   end
 
+  object :player do
+    field(:name, non_null(:string))
+    field(:service_tag, :string)
+    field(:team, :integer)
+    field(:uid, non_null(:id))
+    field(:primary_color, non_null(:string))
+    field(:is_alive, non_null(:boolean))
+    field(:score, :integer)
+    field(:kills, :integer)
+    field(:assists, :integer)
+    field(:deaths, :integer)
+    field(:betrayals, :integer)
+    field(:time_spent_alive, :integer)
+    field(:suicides, :integer)
+    field(:best_streak, :integer)
+  end
+
   object :server do
     @desc "The last updated time for this server"
     field(:cached_at, non_null(:datetime))
@@ -87,6 +104,12 @@ defmodule DoritosWeb.Schema do
 
     @desc "Does this game mode require teams?"
     field(:teams, :boolean)
+
+    @desc "List of team scores"
+    field(:team_scores, list_of(:integer))
+
+    @desc "List of players in the server"
+    field(:players, list_of(:player))
 
     @desc "The number of players currently in-game"
     field(:num_players, :integer)
