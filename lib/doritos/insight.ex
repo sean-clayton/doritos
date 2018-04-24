@@ -7,6 +7,8 @@ defmodule Doritos.Insight do
   end
 
   def get_active_server_count() do
+    Doritos.ServerData.Cache.get_all_data()
+    |> Enum.count()
   end
 
   def get_server_data_by_ip(ip) do

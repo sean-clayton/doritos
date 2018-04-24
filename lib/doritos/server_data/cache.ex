@@ -8,14 +8,17 @@ defmodule Doritos.ServerData.Cache do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def handle_new_data_response({:ok, res}) do
-    debug("[OK] #{res.request_url}")
-    :ets.insert(@table, {res.request_url, res})
+  def handle_new_data_response(res = {:ok, %{request_url: request_url, body: body}}) do
+    json = Jason.decode!(body)
+    :ets.insert(@table, {request_url, json})
+    res
   end
 
-  def handle_new_data_response({:error, ip, _res}) do
+  def handle_new_data_response(res = {:error, ip, _data}) do
     debug("[ERR] #{ip}")
     :ets.delete(@table, ip)
+
+    res
   end
 
   def get_ip_data(ip) do
@@ -30,7 +33,7 @@ defmodule Doritos.ServerData.Cache do
     :ets.new(@table, [
       :set,
       :named_table,
-      :protected,
+      :public,
       read_concurrency: true,
       write_concurrency: true
     ])
