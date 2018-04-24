@@ -73,7 +73,6 @@ defmodule DoritosWeb.Resolver do
   end
 
   def convert_camelcase_to_snakecase(map) do
-    IO.inspect(map)
     for {key, val} <- map, into: %{}, do: {Macro.underscore(key), val}
   end
 
